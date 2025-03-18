@@ -11,6 +11,7 @@ import {
   FileText, 
   HeartPulse, 
   Home, 
+  LogOut,
   MessageSquare, 
   Settings, 
   User, 
@@ -20,6 +21,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 interface SidebarLink {
   icon: React.ElementType;
@@ -50,7 +53,7 @@ const doctorLinks: SidebarLink[] = [
 ];
 
 const DashboardSidebar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const isMobile = useIsMobile();
   const [collapsed, setCollapsed] = useState(false);
@@ -63,6 +66,14 @@ const DashboardSidebar = () => {
       setCollapsed(false);
     }
   }, [isMobile]);
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account",
+    });
+  };
 
   // Determine which links to show based on user role
   const links = user?.role === "patient" ? patientLinks : doctorLinks;
@@ -144,8 +155,20 @@ const DashboardSidebar = () => {
       </nav>
       
       <div className="mt-auto mb-4 px-4">
+        <Button 
+          variant="ghost" 
+          className={cn(
+            "w-full flex items-center rounded-lg p-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors",
+            !collapsed ? "justify-start" : "justify-center"
+          )}
+          onClick={handleLogout}
+        >
+          <LogOut className={cn("h-5 w-5", !collapsed && "mr-3")} />
+          {!collapsed && <span>Logout</span>}
+        </Button>
+        
         <div className={cn(
-          "bg-muted/50 rounded-xl p-4 flex gap-3 transition-all",
+          "bg-muted/50 rounded-xl p-4 flex gap-3 transition-all mt-4",
           collapsed && "flex-col items-center"
         )}>
           {!collapsed ? (
